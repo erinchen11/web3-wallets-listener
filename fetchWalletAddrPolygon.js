@@ -1,6 +1,5 @@
 import "dotenv/config";  // 載入 .env
 import { ethers } from "ethers";
-import fs from "fs";
 import { createObjectCsvWriter } from "csv-writer";
 
 // 從 .env 讀取參數
