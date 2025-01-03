@@ -4,7 +4,7 @@ import { createObjectCsvWriter } from "csv-writer";
 
 // 從 .env 讀取參數
 const PROVIDER_URL = process.env.PROVIDER_URL;
-const USDT_ADDRESS = process.env.USDT_CONTRACT_ADDRESS;
+const USDT_CONTRACT_ADDRESS = process.env.USDT_CONTRACT_ADDRESS;
 const START_BLOCK = parseInt(process.env.START_BLOCK, 10);
 const END_BLOCK = parseInt(process.env.END_BLOCK, 10);
 const WALLETS_CSV_PATH = process.env.WALLETS_CSV_PATH || "usdt_addresses.csv"; 
@@ -19,7 +19,7 @@ const erc20ABI = [
 ];
 
 // 建立合約物件 (讀取 Transfer 事件用)
-const usdtContract = new ethers.Contract(USDT_ADDRESS, erc20ABI, provider);
+const erc20Contract = new ethers.Contract(USDT_CONTRACT_ADDRESS, erc20ABI, provider);
 
 // 建立 CSV Writer：將地址輸出到由環境變數指定的檔案
 const csvWriter = createObjectCsvWriter({
@@ -46,8 +46,8 @@ async function main() {
       console.log(`\nQuerying Transfer events from block ${fromBlock} to ${toBlock}...`);
 
       // 查詢 Transfer 事件
-      const transferEvents = await usdtContract.queryFilter(
-        usdtContract.filters.Transfer(),
+      const transferEvents = await erc20Contract.queryFilter(
+        erc20Contract.filters.Transfer(),
         fromBlock,
         toBlock
       );

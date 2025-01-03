@@ -13,12 +13,14 @@ const MONITOR_RESULTS_CSV_PATH = process.env.MONITOR_RESULTS_CSV_PATH || "usdt_m
 // 初始化 Provider
 const provider = new ethers.WebSocketProvider(PROVIDER_URL);
 
-// 建立合約物件
-const contract = new ethers.Contract(
-  USDT_CONTRACT_ADDRESS,
-  ["event Transfer(address indexed from, address indexed to, uint256 value)"],
-  provider
-);
+
+// ERC-20 Transfer 事件 ABI
+const erc20ABI = [
+  "event Transfer(address indexed from, address indexed to, uint256 value)"
+];
+
+// 建立合約物件 (讀取 Transfer 事件用)
+const erc20Contract = new ethers.Contract(USDT_CONTRACT_ADDRESS, erc20ABI, provider);
 
 // 監控的目標地址集合
 const monitoredAddresses = new Set();
@@ -69,7 +71,7 @@ async function monitorTransferEvents() {
   await loadAddressesFromCSV(WALLETS_CSV_PATH);
 
   // 開始監聽 Transfer 事件
-  contract.on("Transfer", async (from, to, value, event) => {
+  erc20Contract.on("Transfer", async (from, to, value, event) => {
     if (monitoredAddresses.has(to.toLowerCase())) {
       const formattedValue = formatUnits(value, 6); // USDT Decimal = 6
       const blockNumber = event.log.blockNumber;
